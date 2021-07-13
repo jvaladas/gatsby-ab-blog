@@ -10,6 +10,9 @@ const Layout = ({ location, title, children }) => {
     header = (
       <h1 className="main-heading">
         <Link to="/">{title}</Link>
+        <Link to="/about">
+          <span className="about">About</span>
+        </Link>
       </h1>
     )
   } else {
@@ -28,7 +31,7 @@ const Layout = ({ location, title, children }) => {
         © {new Date().getFullYear()}, Built with
         {` `}
         <a href="https://www.gatsbyjs.com">Gatsby</a>
-        by Jorge Valadas
+        {' ' }by Jorge Valadas
       </footer>
     </div>
   )
