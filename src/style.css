@@ -262,6 +262,11 @@ a:focus {
 .post-list-item {
   margin-bottom: var(--spacing-8);
   margin-top: var(--spacing-8);
+  transition-duration: 0.3s;
+}
+
+.post-list-item:hover {
+  transform: scale(1.02);
 }
 
 .post-list-item p {
@@ -287,12 +292,14 @@ a:focus {
 }
 
 .bio {
+  padding: 20px 0px 20px 20px;
   display: flex;
-  margin-bottom: var(--spacing-16);
+  margin-bottom: var(--spacing-10);
 }
 
 .bio p {
   margin-bottom: var(--spacing-0);
+  font-size: var(--fontSize-0);
 }
 
 .bio-avatar {
@@ -304,6 +311,7 @@ a:focus {
 
 .blog-post header h1 {
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-4) var(--spacing-0);
+  color: var(--color-primary);
 }
 
 .blog-post header p {
@@ -313,6 +321,22 @@ a:focus {
 
 .blog-post-nav ul {
   margin: var(--spacing-0);
+}
+
+.blog-post-nav ul p {
+  max-width: 15rem;
+  font-size: var(--fontSize-0);
+}
+
+.blog-post .hidden {
+  display: none;
+}
+
+.blog-post .register-newsletter {
+  border-top: var(--spacing-1) solid var(--color-primary);
+  background-color: #fafafa;
+  padding: 20px 35px 5px 35px;
+  font-weight: 600;
 }
 
 .gatsby-highlight {

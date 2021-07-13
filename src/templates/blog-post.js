@@ -1,21 +1,33 @@
-import * as React from "react"
-import { Link, graphql } from "gatsby"
-
-import Bio from "../components/bio"
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import * as React from "react";
+import { graphql } from "gatsby";
+import { parseHTML } from '../helpers/html-parser';
+import { ABTest, trackPageview } from '../services/ab-testing';
+import PostFooter from '../components/post-footer';
+import Layout from "../components/layout";
+import PostNavigation from "../components/post-navigation";
 
 const BlogPostTemplate = ({ data, location }) => {
   const post = data.markdownRemark
   const siteTitle = data.site.siteMetadata?.title || `Title`
   const { previous, next } = data
+  const [html, setHtml] = React.useState(post.html);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' ) {
+      trackPageview(location.pathname);
+
+      const parsed = parseHTML(post.html);
+      const controls = parsed.querySelectorAll('ab-control');
+
+      if (controls.length > 0) {
+        controls.forEach((c) => ABTest(location.pathname, parsed, c));
+        setHtml(parsed.body.innerHTML);
+      }
+    }
+  }, [post.html, location.pathname]);
 
   return (
     <Layout location={location} title={siteTitle}>
-      <Seo
-        title={post.frontmatter.title}
-        description={post.frontmatter.description || post.excerpt}
-      />
       <article
         className="blog-post"
         itemScope
@@ -26,40 +38,18 @@ const BlogPostTemplate = ({ data, location }) => {
           <p>{post.frontmatter.date}</p>
         </header>
         <section
-          dangerouslySetInnerHTML={{ __html: post.html }}
+          dangerouslySetInnerHTML={{ __html: html }}
           itemProp="articleBody"
         />
-        <hr />
-        <footer>
-          <Bio />
-        </footer>
+        <PostFooter
+          location={location}
+          authorName={post.frontmatter.author}
+        />
       </article>
-      <nav className="blog-post-nav">
-        <ul
-          style={{
-            display: `flex`,
-            flexWrap: `wrap`,
-            justifyContent: `space-between`,
-            listStyle: `none`,
-            padding: 0,
-          }}
-        >
-          <li>
-            {previous && (
-              <Link to={previous.fields.slug} rel="prev">
-                ← {previous.frontmatter.title}
-              </Link>
-            )}
-          </li>
-          <li>
-            {next && (
-              <Link to={next.fields.slug} rel="next">
-                {next.frontmatter.title} →
-              </Link>
-            )}
-          </li>
-        </ul>
-      </nav>
+      <PostNavigation
+        previousPost={previous}
+        nextPost={next}
+      />
     </Layout>
   )
 }
@@ -88,19 +78,23 @@ export const pageQuery = graphql`
       }
     }
     previous: markdownRemark(id: { eq: $previousPostId }) {
+      excerpt
       fields {
         slug
       }
       frontmatter {
         title
+        description
       }
     }
     next: markdownRemark(id: { eq: $nextPostId }) {
+      excerpt
       fields {
         slug
       }
       frontmatter {
         title
+        description
       }
     }
   }
